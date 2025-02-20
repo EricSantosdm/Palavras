@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça-Palavras ODS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .word-grid {
+            display: grid;
+            justify-content: center;
+            gap: 5px;
+        }
+        .word-grid .cell {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            border: 1px solid #ccc;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .word-grid .cell.selected {
+            background-color: yellow;
+        }
+        .word-grid .cell.found {
+            background-color: lightgreen;
+        }
+        .word-list {
+            list-style: none;
+            padding: 0;
+        }
+        .word-list li {
+            text-transform: capitalize;
+        }
+        .word-list li.found {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">Caça-Palavras ODS 6 e 11</h1>
+
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Selecione a Dificuldade</label>
+            <select id="difficulty" class="form-select">
+                <option value="easy">Fácil</option>
+                <option value="medium">Médio</option>
+                <option value="hard">Difícil</option>
+            </select>
+        </div>
+
+        <button id="generate" class="btn btn-primary mb-3">Gerar Caça-Palavras</button>
+
+        <div id="game" class="mt-4">
+            <div id="grid" class="word-grid"></div>
+            <h4 class="mt-4">Palavras para encontrar:</h4>
+            <ul id="word-list" class="word-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const words = {
+            easy: ['agua', 'saneamento', 'vida', 'saude', 'rio', 'ar'],
+            medium: ['esgoto', 'limpeza', 'sustentavel', 'verde', 'planeta', 'cidade', 'lixo', 'energia', 'residuos', 'moradia', 'transporte', 'ambiente'],
+            hard: ['urbanizacao', 'reflorestamento', 'habitacao', 'educacao', 'mobilidade', 'consumo', 'responsavel', 'desenvolvimento', 'inclusivo', 'resiliencia', 'equidade', 'clima', 'cooperacao', 'cidadania', 'agua potavel', 'reciclagem', 'tratamento', 'infraestrutura', 'saude publica', 'saneamento basico']
+        };
+
+        const grid = document.getElementById('grid');
+        const wordList = document.getElementById('word-list');
+        const generateButton = document.getElementById('generate');
+        const difficultySelect = document.getElementById('difficulty');
+
+        let isSelecting = false;
+        let selectedCells = [];
+        let foundWords = [];
+
+        function generateWordGrid(level) {
+            const levelWords = words[level];
+            const gridSize = level === 'easy' ? 8 : level === 'medium' ? 12 : 16;
+            const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
+
+            const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
+
+            selectedWords.forEach(word => {
+                placeWordInGrid(gridArray, word);
+            });
+
+            fillEmptySpaces(gridArray);
+            displayGrid(gridArray);
+            displayWords(selectedWords);
+        }
+
+        function placeWordInGrid(gridArray, word) {
+            const gridSize = gridArray.length;
+            const row = Math.floor(Math.random() * gridSize);
+            const col = Math.floor(Math.random() * (gridSize - word.length));
+
+            for (let i = 0; i < word.length; i++) {
+                gridArray[row][col + i] = word[i];
+            }
+        }
+
+        function fillEmptySpaces(gridArray) {
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            for (let row = 0; row < gridArray.length; row++) {
+                for (let col = 0; col < gridArray[row].length; col++) {
+                    if (!gridArray[row][col]) {
+                        gridArray[row][col] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }
+                }
+            }
+        }
+
+        function displayGrid(gridArray) {
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${gridArray.length}, 1fr)`;
+
+            gridArray.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+                    cellDiv.textContent = cell;
+                    cellDiv.dataset.row = rowIndex;
+                    cellDiv.dataset.col = colIndex;
+
+                    cellDiv.addEventListener('mousedown', () => startSelection(cellDiv));
+                    cellDiv.addEventListener('mouseover', () => continueSelection(cellDiv));
+                    cellDiv.addEventListener('mouseup', endSelection);
+
+                    grid.appendChild(cellDiv);
+                });
+            });
+
+            document.addEventListener('mouseup', () => {
+                isSelecting = false;
+                selectedCells = [];
+            });
+        }
+
+        function displayWords(words) {
+            wordList.innerHTML = '';
+            words.forEach(word => {
+                const li = document.createElement('li');
+                li.textContent = word;
+                wordList.appendChild(li);
+            });
+        }
+
+        function startSelection(cell) {
+            isSelecting = true;
+            selectedCells = [cell];
+            cell.classList.add('selected');
+        }
+
+        function continueSelection(cell) {
+            if (isSelecting && !selectedCells.includes(cell)) {
+                selectedCells.push(cell);
+                cell.classList.add('selected');
+            }
+        }
+
+        function endSelection() {
+            isSelecting = false;
+
+            // Obter a palavra selecionada
+            const selectedWord = selectedCells.map(cell => cell.textContent).join('').toLowerCase();
+
+            // Verificar se a palavra está na lista
+            const wordsToFind = Array.from(wordList.children);
+            const match = wordsToFind.find(li => li.textContent === selectedWord && !foundWords.includes(selectedWord));
+
+            if (match) {
+                // Palavra encontrada
+                match.classList.add('found'); // Riscar a palavra
+                foundWords.push(selectedWord); // Adicionar ao array de palavras encontradas
+
+                // Destacar as células como "encontradas"
+                selectedCells.forEach(cell => {
+                    cell.classList.add('found');
+                    cell.classList.remove('selected');
+                });
+            } else {
+                // Se não for encontrada, remover seleção
+                selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                });
+            }
+
+            selectedCells = [];
+        }
+
+        generateButton.addEventListener('click', () => {
+            const difficulty = difficultySelect.value;
+            generateWordGrid(difficulty);
+        });
+    </script>
+</body>
+</html>
