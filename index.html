@@ -92,30 +92,74 @@
         let isSelecting = false;
         let selectedCells = [];
         let foundWords = [];
+        let startCell = null;
 
         function generateWordGrid(level) {
             const levelWords = words[level];
-            const gridSize = level === 'easy' ? 8 : level === 'medium' ? 12 : 16;
+            const gridSize = 12;
             const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
 
             const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
 
             selectedWords.forEach(word => {
-                placeWordInGrid(gridArray, word);
+                let placed = false;
+                let attempts = 0;
+                const maxAttempts = 100;
+
+                // Vai tentar colocar a palavra no grid
+                while (!placed && attempts < maxAttempts) {
+                    const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+                    const row = Math.floor(Math.random() * gridSize);
+                    const col = Math.floor(Math.random() * gridSize);
+
+                    // Verifica se é possível colocar a palavra no grid
+                    if (canPlaceWord(gridArray, word, row, col, direction, gridSize)) {
+                        // Caso seja possível a palavra é colocada
+                        placeWordInGrid(gridArray, word, row, col, direction);
+                        placed = true;
+                    }
+                    attempts++;
+                }
             });
 
             fillEmptySpaces(gridArray);
             displayGrid(gridArray);
             displayWords(selectedWords);
+            foundWords = [];
         }
 
-        function placeWordInGrid(gridArray, word) {
-            const gridSize = gridArray.length;
-            const row = Math.floor(Math.random() * gridSize);
-            const col = Math.floor(Math.random() * (gridSize - word.length));
+        function canPlaceWord(grid, word, row, col, direction, size) {
+            if (direction === 'horizontal') {
+                // Verifica se a palavra cabe na linha
+                if (col + word.length > size) return false;
+                for (let i = 0; i < word.length; i++) {
+                    // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
+                    if (grid[row][col + i] !== '' && grid[row][col + i] !== word[i]) {
+                        return false;
+                    }
+                }
+            } else {
+                // Verifica se a palavra cabe na coluna
+                if (row + word.length > size) return false;
+                // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[row + i][col] !== '' && grid[row + i][col] !== word[i]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
-            for (let i = 0; i < word.length; i++) {
-                gridArray[row][col + i] = word[i];
+        function placeWordInGrid(grid, word, row, col, direction) {
+            if (direction === 'horizontal') {
+                for (let i = 0; i < word.length; i++) {
+                    grid[row][col + i] = word[i];
+                }
+            } else {
+                for (let i = 0; i < word.length; i++) {
+                    grid[row + i][col] = word[i];
+                }
             }
         }
 
@@ -150,10 +194,12 @@
                 });
             });
 
-            document.addEventListener('mouseup', () => {
-                isSelecting = false;
-                selectedCells = [];
-            });
+                document.addEventListener('mouseup', () => {
+                    isSelecting = false;
+                    // Remove as células selecionadas sempre que iniciar a seleção de uma nova célula
+                    selectedCells.forEach(cell => cell.classList.remove('selected'));
+                    selectedCells = [];
+                });
         }
 
         function displayWords(words) {
@@ -167,14 +213,52 @@
 
         function startSelection(cell) {
             isSelecting = true;
+            startCell = cell;
+            selectedCells.forEach(cell => cell.classList.remove('selected'));
             selectedCells = [cell];
             cell.classList.add('selected');
         }
 
+        // Permite selecionar células na mesma linha ou coluna a partir da célula inicial
         function continueSelection(cell) {
-            if (isSelecting && !selectedCells.includes(cell)) {
-                selectedCells.push(cell);
-                cell.classList.add('selected');
+            if (startCell == null) return;
+            if (!isSelecting || !selectedCells.includes(cell)) {
+                const startRow = parseInt(startCell.dataset.row);
+                const startCol = parseInt(startCell.dataset.col);
+                const currentRow = parseInt(cell.dataset.row);
+                const currentCol = parseInt(cell.dataset.col);
+
+                // Verifica se está na mesma linha ou coluna e depois seleciona todas as letras entre a primeira e a última
+                if (startRow === currentRow || startCol === currentCol) {
+                    selectedCells.forEach(cell => cell.classList.remove('selected'));
+                    selectedCells = [];
+
+                    if (startRow === currentRow) {
+                        const start = Math.min(startCol, currentCol);
+                        const end = Math.max(startCol, currentCol);
+                        for (let col = start; col <= end; col++) {
+                            const cell = document.querySelector(
+                                `[data-row="${startRow}"][data-col="${col}"]`
+                            );
+                            if (cell) {
+                                selectedCells.push(cell);
+                                cell.classList.add('selected');
+                            }
+                        }
+                    } else if (startCol === currentCol) {
+                        const start = Math.min(startRow, currentRow);
+                        const end = Math.max(startRow, currentRow);
+                        for (let row = start; row <= end; row++) {
+                            const cell = document.querySelector(
+                                `[data-row="${row}"][data-col="${startCol}"]`
+                            );
+                            if (cell) {
+                                selectedCells.push(cell);
+                                cell.classList.add('selected');
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -200,6 +284,7 @@
             }
 
             selectedCells = [];
+            startCell = null;
         }
 
         generateButton.addEventListener('click', () => {
