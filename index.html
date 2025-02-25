@@ -188,6 +188,8 @@
         }
 
         function placeWordInGrid(grid, word, row, col, direction) {
+            word = word.toUpperCase();
+            
             if (direction === 'horizontal') {
                 for (let i = 0; i < word.length; i++) {
                     grid[row][col + i] = word[i];
@@ -208,7 +210,7 @@
         }
 
         function fillEmptySpaces(gridArray) {
-            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase();
             for (let row = 0; row < gridArray.length; row++) {
                 for (let col = 0; col < gridArray[row].length; col++) {
                     if (!gridArray[row][col]) {
