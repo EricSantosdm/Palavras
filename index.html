@@ -96,18 +96,16 @@
 
         function generateWordGrid(level) {
             const levelWords = words[level];
-            const gridSize = 12;
+            const gridSize = 15;
             const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
 
             const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
 
             selectedWords.forEach(word => {
                 let placed = false;
-                let attempts = 0;
-                const maxAttempts = 100;
 
                 // Vai tentar colocar a palavra no grid
-                while (!placed && attempts < maxAttempts) {
+                while (!placed) {
 
                     let directions = []
 
@@ -130,7 +128,6 @@
                         placeWordInGrid(gridArray, word, row, col, direction);
                         placed = true;
                     }
-                    attempts++;
                 }
             });
 
