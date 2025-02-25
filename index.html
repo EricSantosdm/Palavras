@@ -108,7 +108,19 @@
 
                 // Vai tentar colocar a palavra no grid
                 while (!placed && attempts < maxAttempts) {
-                    const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+
+                    let directions = []
+
+                    if(level === 'easy'){
+                        directions = ['horizontal', 'vertical'];
+                        
+                    } else if(level === 'medium'){
+                        directions = ['horizontal', 'vertical', 'diagonal-right-down', 'diagonal-right-up'];
+                    } else{
+                        directions = ['horizontal', 'vertical', 'diagonal-right-down', 'diagonal-right-up'];
+                    }
+                    
+                    const direction = directions[Math.floor(Math.random() * directions.length)];
                     const row = Math.floor(Math.random() * gridSize);
                     const col = Math.floor(Math.random() * gridSize);
 
@@ -138,7 +150,7 @@
                         return false;
                     }
                 }
-            } else {
+            } else if(direction === 'vertical') {
                 // Verifica se a palavra cabe na coluna
                 if (row + word.length > size) return false;
                 // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
@@ -147,7 +159,31 @@
                         return false;
                     }
                 }
-            }
+            } else if(direction === 'diagonal-right-down'){
+                // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a direita e para baixo
+                if ((col + word.length > size) || (row + word.length > size)){
+                    return false;  
+                } else {
+                    // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
+                    for (let i = 0; i < word.length; i++) {
+                        if (grid[row + i][col + i] !== '' && grid[row + i][col + i] !== word[i]) {
+                            return false;
+                        }
+                    }
+                }
+            } else if(direction === 'diagonal-right-up'){
+                // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a direita e para cima
+                if ((col + word.length > size) || (row - word.length < 0)){
+                    return false;  
+                } else {
+                    // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
+                    for (let i = 0; i < word.length; i++) {
+                        if (grid[row - i][col + i] !== '' && grid[row - i][col + i] !== word[i]) {
+                            return false;
+                        }
+                    }
+                }
+            } 
             return true;
         }
 
@@ -156,9 +192,17 @@
                 for (let i = 0; i < word.length; i++) {
                     grid[row][col + i] = word[i];
                 }
-            } else {
+            } else if (direction === 'vertical') {
                 for (let i = 0; i < word.length; i++) {
                     grid[row + i][col] = word[i];
+                }
+            } else if(direction === 'diagonal-right-down'){
+                for (let i = 0; i < word.length; i++) {
+                    grid[row + i][col + i] = word[i];
+                }
+            } else if(direction === 'diagonal-right-up'){
+                for (let i = 0; i < word.length; i++) {
+                    grid[row - i][col + i] = word[i];
                 }
             }
         }
@@ -229,13 +273,16 @@
                 const currentCol = parseInt(cell.dataset.col);
 
                 // Verifica se está na mesma linha ou coluna e depois seleciona todas as letras entre a primeira e a última
-                if (startRow === currentRow || startCol === currentCol) {
+                if (startRow === currentRow || startCol === currentCol || Math.abs(startRow - currentRow) === Math.abs(startCol - currentCol)) {
                     selectedCells.forEach(cell => cell.classList.remove('selected'));
                     selectedCells = [];
 
                     if (startRow === currentRow) {
+                        // Seleção horizontal
                         const start = Math.min(startCol, currentCol);
                         const end = Math.max(startCol, currentCol);
+
+                        // Percorre todas as colunas entre start e end
                         for (let col = start; col <= end; col++) {
                             const cell = document.querySelector(
                                 `[data-row="${startRow}"][data-col="${col}"]`
@@ -246,12 +293,31 @@
                             }
                         }
                     } else if (startCol === currentCol) {
+                        // Seleção vertical
                         const start = Math.min(startRow, currentRow);
                         const end = Math.max(startRow, currentRow);
+
+                        // Percorre todas as linhas entre start e end
                         for (let row = start; row <= end; row++) {
                             const cell = document.querySelector(
                                 `[data-row="${row}"][data-col="${startCol}"]`
                             );
+                            if (cell) {
+                                selectedCells.push(cell);
+                                cell.classList.add('selected');
+                            }
+                        }
+                    } else{
+                        // Seleção diagonal
+                        const steps = Math.abs(startRow - currentRow); // Número de passos necessários
+                        const rowStep = startRow < currentRow ? 1 : -1; // Define se a diagonal está indo para baixo (+1) ou para cima (-1)
+                        const colStep = startCol < currentCol ? 1 : -1; // Define se a diagonal está indo para direita (+1) ou para esquerda (-1)
+
+                        // Percorre todos os passos na diagonal
+                        for (let i = 0; i <= steps; i++) {
+                            const row = startRow + i * rowStep;
+                            const col = startCol + i * colStep;
+                            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                             if (cell) {
                                 selectedCells.push(cell);
                                 cell.classList.add('selected');
