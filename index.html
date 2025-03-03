@@ -18,7 +18,7 @@
             display: grid;
             justify-content: center;
             margin: 20px auto;
-            max-width: 900px; /* Limita a largura da grade */
+            max-width: 950px; /* Limita a largura da grade */
         }
         .word-grid .cell {
             width: 40px;
@@ -100,7 +100,7 @@
 
         function generateWordGrid(level) {
             const levelWords = words[level];
-            const gridSize = 15;
+            const gridSize = level === 'easy' ? 15 : level === 'medium' ? 15 : 23;
             const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
 
             const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
@@ -111,15 +111,17 @@
                 // Vai tentar colocar a palavra no grid
                 while (!placed) {
 
-                    let directions = []
+                    let directions = [];
+                    let invert = 1;
 
                     if(level === 'easy'){
                         directions = ['horizontal', 'vertical'];
                         
                     } else if(level === 'medium'){
-                        directions = ['horizontal', 'vertical', 'diagonal-right-down', 'diagonal-right-up'];
+                        directions = ['horizontal', 'vertical', 'diagonal-down', 'diagonal-up'];
                     } else{
-                        directions = ['horizontal', 'vertical', 'diagonal-right-down', 'diagonal-right-up'];
+                        directions = ['horizontal', 'vertical', 'diagonal-down', 'diagonal-up'];
+                        invert = Math.floor(Math.random() < 0.5 ? 1 : -1);
                     }
                     
                     const direction = directions[Math.floor(Math.random() * directions.length)];
@@ -127,9 +129,9 @@
                     const col = Math.floor(Math.random() * gridSize);
 
                     // Verifica se é possível colocar a palavra no grid
-                    if (canPlaceWord(gridArray, word, row, col, direction, gridSize)) {
+                    if (canPlaceWord(gridArray, word, row, col, direction, gridSize, invert)) {
                         // Caso seja possível a palavra é colocada
-                        placeWordInGrid(gridArray, word, row, col, direction);
+                        placeWordInGrid(gridArray, word, row, col, direction, invert);
                         placed = true;
                     }
                 }
@@ -141,71 +143,77 @@
             foundWords = [];
         }
 
-        function canPlaceWord(grid, word, row, col, direction, size) {
+        function canPlaceWord(grid, word, row, col, direction, size, invert) {
             if (direction === 'horizontal') {
-                // Verifica se a palavra cabe na linha
-                if (col + word.length > size) return false;
+                // Verifica se a palavra cabe na linha, da equerda para a direita ou da direita para a esquerda
+                if ((invert === 1 && col + word.length > size) || (invert === -1 && col - word.length + 1 < 0)) return false;
                 for (let i = 0; i < word.length; i++) {
                     // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
-                    if (grid[row][col + i] !== '' && grid[row][col + i] !== word[i]) {
+                    if (grid[row][col + (i * invert)] !== '' && grid[row][col + (i * invert)] !== word[i]) {
                         return false;
                     }
                 }
             } else if(direction === 'vertical') {
-                // Verifica se a palavra cabe na coluna
-                if (row + word.length > size) return false;
+                // Verifica se a palavra cabe na coluna, de cima para baixo ou de baixo para cima
+                if ((invert === 1 && row + word.length > size) || (invert === -1 && row - word.length + 1 < 0)) return false;
                 // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
                 for (let i = 0; i < word.length; i++) {
-                    if (grid[row + i][col] !== '' && grid[row + i][col] !== word[i]) {
+                    if (grid[row + (i * invert)][col] !== '' && grid[row + (i * invert)][col] !== word[i]) {
                         return false;
                     }
                 }
-            } else if(direction === 'diagonal-right-down'){
+            } else if(direction === 'diagonal-down'){
                 // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a direita e para baixo
-                if ((col + word.length > size) || (row + word.length > size)){
+                if (invert === 1 && ((col + word.length > size) || (row + word.length > size))){
                     return false;  
-                } else {
+                }
+                // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a esquerda e para baixo 
+                else if(invert === -1 && ((col - word.length + 1 < 0) || (row + word.length > size))){
+                    return false
+                }
                     // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
                     for (let i = 0; i < word.length; i++) {
-                        if (grid[row + i][col + i] !== '' && grid[row + i][col + i] !== word[i]) {
+                        if (grid[row + i][col + (i * invert)] !== '' && grid[row + i][col + (i * invert)] !== word[i]) {
                             return false;
                         }
                     }
-                }
-            } else if(direction === 'diagonal-right-up'){
+            } else if(direction === 'diagonal-up'){
                 // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a direita e para cima
-                if ((col + word.length > size) || (row - word.length < 0)){
+                if (invert === 1 && ((col + word.length > size) || (row - word.length + 1 < 0))){
                     return false;  
-                } else {
+                }
+                // Verifica se a palavra cabe na linha e na coluna ao crescer na diagonal para a esquerda e para cima 
+                else if(invert === -1 && ((col - word.length + 1 < 0) || (row - word.length + 1 < 0))){
+                    return false
+                }
                     // Verifica se a célula já está ocupada por uma letra e, se estiver, verifica se é diferente da letra da palavra
                     for (let i = 0; i < word.length; i++) {
-                        if (grid[row - i][col + i] !== '' && grid[row - i][col + i] !== word[i]) {
+                        if (grid[row - i][col + (i * invert)] !== '' && grid[row - i][col + (i * invert)] !== word[i]) {
                             return false;
                         }
                     }
-                }
             } 
             return true;
         }
 
-        function placeWordInGrid(grid, word, row, col, direction) {
+        function placeWordInGrid(grid, word, row, col, direction, invert) {
             word = word.toUpperCase();
             
             if (direction === 'horizontal') {
                 for (let i = 0; i < word.length; i++) {
-                    grid[row][col + i] = word[i];
+                    grid[row][col + (i * invert)] = word[i];
                 }
             } else if (direction === 'vertical') {
                 for (let i = 0; i < word.length; i++) {
-                    grid[row + i][col] = word[i];
+                    grid[row + (i * invert)][col] = word[i];
                 }
-            } else if(direction === 'diagonal-right-down'){
+            } else if(direction === 'diagonal-down'){
                 for (let i = 0; i < word.length; i++) {
-                    grid[row + i][col + i] = word[i];
+                    grid[row + i][col + (i * invert)] = word[i];
                 }
-            } else if(direction === 'diagonal-right-up'){
+            } else if(direction === 'diagonal-up'){
                 for (let i = 0; i < word.length; i++) {
-                    grid[row - i][col + i] = word[i];
+                    grid[row - i][col + (i * invert)] = word[i];
                 }
             }
         }
@@ -335,8 +343,12 @@
             isSelecting = false;
 
             const selectedWord = selectedCells.map(cell => cell.textContent).join('').toLowerCase();
+            const selectedWordReverse = selectedCells.map(cell => cell.textContent).reverse().join('').toLowerCase();
             const wordsToFind = Array.from(wordList.children);
-            const match = wordsToFind.find(li => li.textContent === selectedWord && !foundWords.includes(selectedWord));
+            const match = wordsToFind.find((li => li.textContent === selectedWord && !foundWords.includes(selectedWord) || 
+                                            li.textContent === selectedWordReverse && !foundWords.includes(selectedWordReverse)));
+
+            console.log(selectedWord)
 
             if (match) {
                 match.classList.add('found');
