@@ -54,6 +54,26 @@
         .word-list li.found {
             text-decoration: line-through;
         }
+
+        @media (max-width: 576px) {
+            .word-grid .cell {
+                width: 28px;
+                height: 28px;
+                line-height: 28px;
+                font-size: 14px;
+                margin: 2px;
+            }
+
+            .word-list li {
+                font-size: 12px;
+                padding: 4px;
+                margin: 3px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -82,7 +102,22 @@
         const words = {
             easy: ['agua', 'saneamento', 'vida', 'saude', 'rio', 'ar'],
             medium: ['esgoto', 'limpeza', 'sustentavel', 'verde', 'planeta', 'cidade', 'lixo', 'energia', 'residuos', 'moradia', 'transporte', 'ambiente'],
-            hard: ['urbanizacao', 'reflorestamento', 'habitacao', 'educacao', 'mobilidade', 'consumo', 'responsavel', 'desenvolvimento', 'inclusivo', 'resiliencia', 'equidade', 'clima', 'cooperacao', 'cidadania', 'agua potavel', 'reciclagem', 'tratamento', 'infraestrutura', 'saude publica', 'saneamento basico']
+            hard: [
+                'urbanizacao',
+                'habitacao',
+                'educacao',
+                'mobilidade',
+                'consumo',
+                'responsavel',
+                'inclusivo',
+                'resiliencia',
+                'equidade',
+                'clima',
+                'cooperacao',
+                'cidadania',
+                'reciclagem',
+                'tratamento'
+            ]
         };
 
         const grid = document.getElementById('grid');
@@ -97,7 +132,7 @@
 
         function generateWordGrid(level) {
             const levelWords = words[level];
-            const gridSize = level === 'easy' ? 15 : level === 'medium' ? 15 : 23;
+            const gridSize = 15;
             const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
 
             const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
@@ -241,6 +276,23 @@
                     cellDiv.addEventListener('mousedown', () => startSelection(cellDiv));
                     cellDiv.addEventListener('mouseover', () => continueSelection(cellDiv));
                     cellDiv.addEventListener('mouseup', endSelection);
+
+                    cellDiv.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        startSelection(cellDiv);
+                    });
+                    cellDiv.addEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                        if (target && target.classList.contains('cell')) {
+                            continueSelection(target);
+                        }
+                    });
+                    cellDiv.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        endSelection();
+                    });
 
                     grid.appendChild(cellDiv);
                 });
