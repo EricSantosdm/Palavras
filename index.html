@@ -28,7 +28,7 @@
             font-weight: bold;
             cursor: pointer;
             user-select: none;
-            margin: 3px 0px;
+            margin: 3px 1.5px;
             border-radius: 20%;
         }
         .word-grid .cell.selected {
@@ -124,6 +124,7 @@
         const wordList = document.getElementById('word-list');
         const generateButton = document.getElementById('generate');
         const difficultySelect = document.getElementById('difficulty');
+        const isMobile = window.innerWidth <= 768;
 
         let isSelecting = false;
         let selectedCells = [];
@@ -132,8 +133,14 @@
 
         function generateWordGrid(level) {
             const levelWords = words[level];
-            const gridSize = 15;
             const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
+            const gridSize = isMobile
+                ? 12
+                : level === 'easy'
+                    ? 15
+                    : level === 'medium'
+                        ? 18
+                        : 20;
 
             const gridArray = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
 
