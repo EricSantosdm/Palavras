@@ -99,23 +99,13 @@
     </div>
 
     <script>
-        const words = [
+        const mobileWords = [
         'limpeza',
         'água',
         'higiene',
         'consciente',
         'cuidado',
-        'nascentes',
-        'renováveis',
         'rios',
-        'educação',
-        'sustentar',
-        'valorização',
-        'ecológicas',
-        'comunidade',
-        'equilíbrio',
-        'saneamento',
-        'planeta',
         'futuro',
         'potável',
         'reúso',
@@ -123,28 +113,65 @@
         'armazenar',
         'inclusão',
         'proteção',
-        'tecnologia',
-        'arborização',
         'energia',
-        'crescimento',
         'urbano',
         'unidos',
-        'transporte',
-        'urbanização',
-        'segurança',
         'cultura',
-        'cidadania',
-        'prédios',
-        'respeito',
-        'renovável',
-        'qualidade',
-        'trânsito',
         'ruas',
         'parques',
         'cidade',
         'rampas',
         'reciclar',
-        'ciclovias'
+        'ciclovias',
+        'equilíbrio'
+        ];
+
+        const desktopWords = [
+        'limpeza',
+        'água',
+        'higiene',
+        'consciente',
+        'cuidado',
+        'rios',
+        'futuro',
+        'potável',
+        'reúso',
+        'filtro',
+        'armazenar',
+        'inclusão',
+        'proteção',
+        'energia',
+        'urbano',
+        'unidos',
+        'cultura',
+        'ruas',
+        'parques',
+        'cidade',
+        'rampas',
+        'reciclar',
+        'ciclovias',
+        'equilíbrio',
+        'nascentes',
+        'renováveis',
+        'educação',
+        'sustentar',
+        'valorização',
+        'ecológicas',
+        'comunidade',
+        'saneamento',
+        'planeta',
+        'tecnologia',
+        'arborização',
+        'crescimento',
+        'transporte',
+        'urbanização',
+        'segurança',
+        'cidadania',
+        'prédios',
+        'respeito',
+        'renovável',
+        'qualidade',
+        'trânsito'
         ];
 
         const grid = document.getElementById('grid');
@@ -159,7 +186,15 @@
         let startCell = null;
 
         function generateWordGrid(level) {
-            const selectedWords = words.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
+            const words = isMobile ? mobileWords : desktopWords;
+            const selectedWords = [...words].sort(() => 0.5 - Math.random()).slice(
+            0,
+            level === 'easy'
+                ? isMobile ? 5 : 6
+                : level === 'medium'
+                ? isMobile ? 7 : 12
+                : isMobile ? 9 : 20
+            );
             const gridSize = isMobile
                 ? 12
                 : level === 'easy'
