@@ -99,26 +99,53 @@
     </div>
 
     <script>
-        const words = {
-            easy: ['agua', 'saneamento', 'vida', 'saude', 'rio', 'ar'],
-            medium: ['esgoto', 'limpeza', 'sustentavel', 'verde', 'planeta', 'cidade', 'lixo', 'energia', 'residuos', 'moradia', 'transporte', 'ambiente'],
-            hard: [
-                'urbanizacao',
-                'habitacao',
-                'educacao',
-                'mobilidade',
-                'consumo',
-                'responsavel',
-                'inclusivo',
-                'resiliencia',
-                'equidade',
-                'clima',
-                'cooperacao',
-                'cidadania',
-                'reciclagem',
-                'tratamento'
-            ]
-        };
+        const words = [
+        'limpeza',
+        'água',
+        'higiene',
+        'consciente',
+        'cuidado',
+        'nascentes',
+        'renováveis',
+        'rios',
+        'educação',
+        'sustentar',
+        'valorização',
+        'ecológicas',
+        'comunidade',
+        'equilíbrio',
+        'saneamento',
+        'planeta',
+        'futuro',
+        'potável',
+        'reúso',
+        'filtro',
+        'armazenar',
+        'inclusão',
+        'proteção',
+        'tecnologia',
+        'arborização',
+        'energia',
+        'crescimento',
+        'urbano',
+        'unidos',
+        'transporte',
+        'urbanização',
+        'segurança',
+        'cultura',
+        'cidadania',
+        'prédios',
+        'respeito',
+        'renovável',
+        'qualidade',
+        'trânsito',
+        'ruas',
+        'parques',
+        'cidade',
+        'rampas',
+        'reciclar',
+        'ciclovias'
+        ];
 
         const grid = document.getElementById('grid');
         const wordList = document.getElementById('word-list');
@@ -132,8 +159,7 @@
         let startCell = null;
 
         function generateWordGrid(level) {
-            const levelWords = words[level];
-            const selectedWords = levelWords.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
+            const selectedWords = words.sort(() => 0.5 - Math.random()).slice(0, level === 'easy' ? 6 : level === 'medium' ? 12 : 20);
             const gridSize = isMobile
                 ? 12
                 : level === 'easy'
