@@ -10,50 +10,84 @@
             font-family: Arial, sans-serif;
             text-align: center;
         }
+        
         h1 {
             color: #333;
         }
+        
+        #game {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
         .word-grid {
             display: grid;
-            justify-content: center;
-            margin: 20px auto;
-            max-width: 800px; /* Limita a largura da grade */
+            gap: 6px;
+            max-width: 90vw;
         }
+
         .word-grid .cell {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             text-align: center;
-            line-height: 40px;
+            line-height: 32px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             user-select: none;
-            margin: 3px 1.5px;
-            border-radius: 20%;
+            border-radius: 10%;
+            transition: background-color 0.2s ease;
         }
+
         .word-grid .cell.selected {
-            background-color: yellow;
+            background-color: #ffe066;
+            border-color: #f1c40f;
         }
+
         .word-grid .cell.found {
-            background-color: lightgreen;
-            color: green;
-            border-color: green;
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #28a745;
         }
+
         .word-list {
+            width: 100%;
+            max-width: 350px;
             list-style: none;
             padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-start;
+            align-content: flex-start;
+            justify-content: center;
         }
+
         .word-list li {
-            text-transform: capitalize;
-            display: inline-block;
-            margin: 5px;
-            padding: 5px;
-            background-color: #ddd;
-            border-radius: 5px;
+            background-color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c2c2c;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
+
         .word-list li.found {
+            background-color: #d4edda;
+            color: #155724;
             text-decoration: line-through;
         }
+
         #congrats-screen {
             position: fixed;
             top: 0;
@@ -85,18 +119,28 @@
         }
 
         @media (max-width: 576px) {
+            #game {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .word-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                max-width: 90vw;
+            }
+
+            .word-list li {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+
             .word-grid .cell {
                 width: 28px;
                 height: 28px;
                 line-height: 28px;
                 font-size: 14px;
-                margin: 2px;
-            }
-
-            .word-list li {
-                font-size: 12px;
-                padding: 4px;
-                margin: 3px;
             }
 
             h1 {
@@ -120,11 +164,13 @@
 
         <button id="generate" class="btn btn-primary mb-3">Gerar Caça-Palavras</button>
 
-        <div id="game" class="mt-4">
+        <div id="game">
             <div id="grid" class="word-grid"></div>
-            <h4 class="mt-4">Palavras para encontrar:</h4>
-            <ul id="word-list" class="word-list"></ul>
-        </div>
+            <div>
+                <h4>Palavras para encontrar:</h4>
+                <ul id="word-list" class="word-list"></ul>
+            </div>
+        </div>        
 
         <div id="congrats-screen" class="d-none">
             <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Check">
@@ -232,7 +278,7 @@
                 : isMobile ? 9 : 20
             );
             const gridSize = isMobile
-                ? 12
+                ? 15
                 : level === 'easy'
                     ? 15
                     : level === 'medium'
