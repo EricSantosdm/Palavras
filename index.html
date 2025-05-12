@@ -195,80 +195,58 @@
     </div>
 
     <script>
-        const mobileWords = [
-        'limpeza',
-        'água',
-        'higiene',
-        'consciente',
-        'cuidado',
-        'rios',
-        'futuro',
-        'potável',
-        'reúso',
-        'filtro',
-        'armazenar',
-        'inclusão',
-        'proteção',
-        'energia',
-        'urbano',
-        'unidos',
-        'cultura',
-        'ruas',
-        'parques',
-        'cidade',
-        'rampas',
-        'reciclar',
-        'ciclovias',
-        'equilíbrio'
-        ];
-
-        const desktopWords = [
-        'limpeza',
-        'água',
-        'higiene',
-        'consciente',
-        'cuidado',
-        'rios',
-        'futuro',
-        'potável',
-        'reúso',
-        'filtro',
-        'armazenar',
-        'inclusão',
-        'proteção',
-        'energia',
-        'urbano',
-        'unidos',
-        'cultura',
-        'ruas',
-        'parques',
-        'cidade',
-        'rampas',
-        'reciclar',
-        'ciclovias',
-        'equilíbrio',
-        'nascentes',
-        'renováveis',
-        'educação',
-        'sustentar',
-        'valorização',
-        'ecológicas',
-        'comunidade',
-        'saneamento',
-        'planeta',
-        'tecnologia',
-        'arborização',
-        'crescimento',
-        'transporte',
-        'urbanização',
-        'segurança',
-        'cidadania',
-        'prédios',
-        'respeito',
-        'renovável',
-        'qualidade',
-        'trânsito'
-        ];
+        const Words = [
+            'limpeza',
+            'higiene',
+            'nascente',
+            'consciência',
+            'renovável',
+            'ambiental',
+            'sustentável',
+            'valorizar',
+            'cuidado',
+            'equilíbrio',
+            'saneamento',
+            'planeta',
+            'futuro',
+            'esgoto',
+            'beber',
+            'reúso',
+            'potável',
+            'filtro',
+            'chuva',
+            'vital',
+            'tratada',
+            'comunidade',
+            'habitação',
+            'inclusão',
+            'proteção',
+            'tecnologia',
+            'arborização',
+            'energia',
+            'crescimento',
+            'transporte',
+            'urbanização',
+            'bairro',
+            'cultura',
+            'educação',
+            'respeito',
+            'qualidade',
+            'segurança',
+            'praça',
+            'parque',
+            'cidade',
+            'acessível',
+            'reciclagem',
+            'ciclovia',
+            'natureza',
+            'verde',
+            'limpa',
+            'árvore',
+            'viver',
+            'união',
+            'saúde'
+            ];
 
         let seconds = 0;
         let timerInterval = null;
@@ -321,14 +299,14 @@
         let startCell = null;
 
         function generateWordGrid(level) {
-            const words = isMobile ? mobileWords : desktopWords;
+            const words = Words;
             const selectedWords = [...words].sort(() => 0.5 - Math.random()).slice(
             0,
             level === 'easy'
-                ? isMobile ? 5 : 6
+                ? isMobile ? 8 : 10
                 : level === 'medium'
-                ? isMobile ? 7 : 12
-                : isMobile ? 9 : 20
+                ? isMobile ? 10 : 16
+                : isMobile ? 12 : 20
             );
             const gridSize = isMobile
                 ? 15
@@ -345,6 +323,9 @@
 
                 // Vai tentar colocar a palavra no grid
                 while (!placed) {
+
+                    // Seleciona uma palavra aleatória
+                    const word = words[Math.floor(Math.random() * words.length)];
 
                     let directions = [];
                     let invert = 1;
