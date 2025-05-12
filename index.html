@@ -305,8 +305,8 @@
             level === 'easy'
                 ? isMobile ? 8 : 10
                 : level === 'medium'
-                ? isMobile ? 10 : 16
-                : isMobile ? 12 : 20
+                ? isMobile ? 9 : 16
+                : isMobile ? 10 : 20
             );
             const gridSize = isMobile
                 ? 15
@@ -323,9 +323,6 @@
 
                 // Vai tentar colocar a palavra no grid
                 while (!placed) {
-
-                    // Seleciona uma palavra aleatória
-                    const word = words[Math.floor(Math.random() * words.length)];
 
                     let directions = [];
                     let invert = 1;
