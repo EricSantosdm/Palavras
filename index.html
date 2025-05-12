@@ -108,7 +108,7 @@
             height: 100px;
         }
 
-        #congrats-screen h2 {
+        #congrats-screen h2, p {
             color: white;
             margin-top: 1rem;
         }
@@ -162,7 +162,15 @@
             </select>
         </div>
 
-        <button id="generate" class="btn btn-primary mb-3">Gerar Caça-Palavras</button>
+        <button 
+        onclick="startTimer()" 
+        id="generate" 
+        class="btn btn-primary mb-3"
+        >
+            Gerar Caça-Palavras
+        </button>
+
+        <h1 id="timer"></h1>
 
         <div id="game">
             <div id="grid" class="word-grid"></div>
@@ -175,7 +183,13 @@
         <div id="congrats-screen" class="d-none">
             <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Check">
             <h2 class="mt-3">Parabéns! Você encontrou todas as palavras!</h2>
-            <button id="play-again" class="btn btn-success mt-3">Jogar Novamente</button>
+            <p id="completion-time" class="mt-3"></p>
+            <button 
+            onclick="startTimer()"
+            id="play-again" 
+            class="btn btn-success mt-3"
+                >Jogar Novamente
+            </button>
         </div>
         
     </div>
@@ -255,6 +269,45 @@
         'qualidade',
         'trânsito'
         ];
+
+        let seconds = 0;
+        let timerInterval = null;
+
+        function formatTime(sec) {
+            const minutes = Math.floor(sec / 60).toString().padStart(2, '0');
+            const secs = (sec % 60).toString().padStart(2, '0');
+            return `${minutes}:${secs}`;
+        }
+
+        function updateDisplay() {
+            document.getElementById('timer').innerText = formatTime(seconds);
+        }
+
+        function startTimer() {
+            resetTimer();
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            // para o timer
+            pauseTimer();    
+            // zera a contagem 
+            seconds = 0;    
+            // atualiza o display  
+            updateDisplay();  
+        }
+
+        // inicia em 00:00
+        updateDisplay(); 
 
         const grid = document.getElementById('grid');
         const wordList = document.getElementById('word-list');
@@ -568,7 +621,11 @@
 
             const allWordsFound = wordsToFind.every(li => li.classList.contains('found'));
             if (allWordsFound) {
+                pauseTimer();
+                const timeTaken = formatTime(seconds);
+                document.getElementById("completion-time").innerText = `Você concluiu o jogo em ${timeTaken}. Excelente trabalho!`;
                 document.getElementById('congrats-screen').classList.remove('d-none');
+                resetTimer();
             }
 
         }
