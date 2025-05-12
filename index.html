@@ -528,68 +528,67 @@
 
         // Permite selecionar células na mesma linha ou coluna a partir da célula inicial
         function continueSelection(cell) {
-            if (startCell == null) return;
-            if (!isSelecting || !selectedCells.includes(cell)) {
-                const startRow = parseInt(startCell.dataset.row);
-                const startCol = parseInt(startCell.dataset.col);
-                const currentRow = parseInt(cell.dataset.row);
-                const currentCol = parseInt(cell.dataset.col);
+            if (startCell == null || !isSelecting) return;
+            
+            const startRow = parseInt(startCell.dataset.row);
+            const startCol = parseInt(startCell.dataset.col);
+            const currentRow = parseInt(cell.dataset.row);
+            const currentCol = parseInt(cell.dataset.col);
 
-                // Verifica se está na mesma linha ou coluna e depois seleciona todas as letras entre a primeira e a última
-                if (startRow === currentRow || startCol === currentCol || Math.abs(startRow - currentRow) === Math.abs(startCol - currentCol)) {
-                    selectedCells.forEach(cell => cell.classList.remove('selected'));
-                    selectedCells = [];
+            // Verifica se está na mesma linha ou coluna e depois seleciona todas as letras entre a primeira e a última
+            if (startRow === currentRow || startCol === currentCol || Math.abs(startRow - currentRow) === Math.abs(startCol - currentCol)) {
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+                selectedCells = [];
 
-                    if (startRow === currentRow) {
-                        // Seleção horizontal
-                        const start = Math.min(startCol, currentCol);
-                        const end = Math.max(startCol, currentCol);
+                if (startRow === currentRow) {
+                    // Seleção horizontal
+                    const start = Math.min(startCol, currentCol);
+                    const end = Math.max(startCol, currentCol);
 
-                        // Percorre todas as colunas entre start e end
-                        for (let col = start; col <= end; col++) {
-                            const cell = document.querySelector(
-                                `[data-row="${startRow}"][data-col="${col}"]`
-                            );
-                            if (cell) {
-                                selectedCells.push(cell);
-                                cell.classList.add('selected');
-                            }
+                    // Percorre todas as colunas entre start e end
+                    for (let col = start; col <= end; col++) {
+                        const cell = document.querySelector(
+                            `[data-row="${startRow}"][data-col="${col}"]`
+                        );
+                        if (cell) {
+                            selectedCells.push(cell);
+                            cell.classList.add('selected');
                         }
-                    } else if (startCol === currentCol) {
-                        // Seleção vertical
-                        const start = Math.min(startRow, currentRow);
-                        const end = Math.max(startRow, currentRow);
+                    }
+                } else if (startCol === currentCol) {
+                    // Seleção vertical
+                    const start = Math.min(startRow, currentRow);
+                    const end = Math.max(startRow, currentRow);
 
-                        // Percorre todas as linhas entre start e end
-                        for (let row = start; row <= end; row++) {
-                            const cell = document.querySelector(
-                                `[data-row="${row}"][data-col="${startCol}"]`
-                            );
-                            if (cell) {
-                                selectedCells.push(cell);
-                                cell.classList.add('selected');
-                            }
+                    // Percorre todas as linhas entre start e end
+                    for (let row = start; row <= end; row++) {
+                        const cell = document.querySelector(
+                            `[data-row="${row}"][data-col="${startCol}"]`
+                        );
+                        if (cell) {
+                            selectedCells.push(cell);
+                            cell.classList.add('selected');
                         }
-                    } else{
-                        // Seleção diagonal
-                        const steps = Math.abs(startRow - currentRow); // Número de passos necessários
-                        const rowStep = startRow < currentRow ? 1 : -1; // Define se a diagonal está indo para baixo (+1) ou para cima (-1)
-                        const colStep = startCol < currentCol ? 1 : -1; // Define se a diagonal está indo para direita (+1) ou para esquerda (-1)
+                    }
+                } else{
+                    // Seleção diagonal
+                    const steps = Math.abs(startRow - currentRow); // Número de passos necessários
+                    const rowStep = startRow < currentRow ? 1 : -1; // Define se a diagonal está indo para baixo (+1) ou para cima (-1)
+                    const colStep = startCol < currentCol ? 1 : -1; // Define se a diagonal está indo para direita (+1) ou para esquerda (-1)
 
-                        // Percorre todos os passos na diagonal
-                        for (let i = 0; i <= steps; i++) {
-                            const row = startRow + i * rowStep;
-                            const col = startCol + i * colStep;
-                            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-                            if (cell) {
-                                selectedCells.push(cell);
-                                cell.classList.add('selected');
-                            }
+                    // Percorre todos os passos na diagonal
+                    for (let i = 0; i <= steps; i++) {
+                        const row = startRow + i * rowStep;
+                        const col = startCol + i * colStep;
+                        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                        if (cell) {
+                            selectedCells.push(cell);
+                            cell.classList.add('selected');
                         }
                     }
                 }
             }
-        }
+            }
 
         function endSelection() {
             isSelecting = false;
